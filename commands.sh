@@ -20,7 +20,7 @@ sql() {
 }
 
 sqla() {
-  sql "EXPLAIN (ANALYZE true, FORMAT yaml) $*"
+  sql "EXPLAIN (ANALYZE true, FORMAT TEXT) $*"
   sql "$@"
 }
 
@@ -37,9 +37,48 @@ likeb(){
 }
 
 like(){
-  sqla "SELECT * FROM people WHERE name ILIKE '%juxtapositions%'"
+  sqla "SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%'"
 }
 
+like2(){
+	sql "set enable_seqscan=off; EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%'"
+#	----------------------------------------------------------
+# - Plan:                                                  +
+#     Node Type: "Bitmap Heap Scan"                        +
+#     Parallel Aware: false                                +
+#     Relation Name: "people"                              +
+#     Alias: "people"                                      +
+#     Startup Cost: 2030869.14                             +
+#     Total Cost: 2037153.85                               +
+#     Plan Rows: 1695                                      +
+#     Plan Width: 87                                       +
+#     Actual Startup Time: 25210.254                       +
+#     Actual Total Time: 25941.846                         +
+#     Actual Rows: 787                                     +
+#     Actual Loops: 1                                      +
+#     Recheck Cond: "(name ~~* '%juxtapositions%'::text)"  +
+#     Rows Removed by Index Recheck: 127                   +
+#     Exact Heap Blocks: 912                               +
+#     Lossy Heap Blocks: 0                                 +
+#     Plans:                                               +
+#       - Node Type: "Bitmap Index Scan"                   +
+#         Parent Relationship: "Outer"                     +
+#         Parallel Aware: false                            +
+#         Index Name: "name_trigram_idx"                   +
+#         Startup Cost: 0.00                               +
+#         Total Cost: 2030868.71                           +
+#         Plan Rows: 1695                                  +
+#         Plan Width: 0                                    +
+#         Actual Startup Time: 25208.029                   +
+#         Actual Total Time: 25208.036                     +
+#         Actual Rows: 921                                 +
+#         Actual Loops: 1                                  +
+#         Index Cond: "(name ~~* '%juxtapositions%'::text)"+
+#   Planning Time: 32.722                                  +
+#   Triggers:                                              +
+#   Execution Time: 25952.997
+#(1 row)
+}
 like10(){
 	sqla "SELECT * FROM people WHERE name ILIKE '%some%' limit 10"
 }
@@ -243,4 +282,12 @@ meta() {
   sql "SELECT METAPHONE('bikes recuperating braved stolidest riffs', 10)"
 }
 
+version(){
+	sql "SELECT version()"
+
+}
+
+pg_trgm_version(){
+	sql "\dx"
+}
 "$@"
