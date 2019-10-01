@@ -20,8 +20,13 @@ sql() {
 }
 
 sqla() {
-  sql "EXPLAIN (ANALYZE, BUFFERS) $*"
-  sql "$@"
+  sql "set enable_seqscan=on; EXPLAIN (ANALYZE, BUFFERS) $*"
+#  sql "$@"
+}
+
+sqlano() {
+  sql "set enable_seqscan=off; EXPLAIN (ANALYZE, BUFFERS) $*"
+#  sql "$@"
 }
 
 c() {
@@ -36,33 +41,16 @@ likeb(){
   sqla "SELECT * FROM people WHERE name ILIKE 'some%'"
 }
 
+q="SELECT * FROM people WHERE name ILIKE '%some%' order by id asc limit 10 offset 1"
+
 like(){
-  sqla "SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%'"
+  sqla "$q"
 }
 
-likel(){
-  sqla "SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%' limit 10"
+likeno(){
+  sqlano "$q"
 }
 
-likeol(){
-  sqla "SELECT * FROM people WHERE name ILIKE '%some%' order by id limit 10 offset 2"
-}
-
-like2(){
-	sql "set enable_seqscan=off; EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%'"
-}
-like10(){
-	sqla "SELECT * FROM people WHERE name ILIKE '%some%' limit 10"
-}
-
-update() {
-  sql "UPDATE people SET metaphone=METAPHONE(name, 10)"
-}
-
-meta() {
-  sql "SELECT METAPHONE('biker recuperating braved stolidest riffs', 10)"
-  sql "SELECT METAPHONE('bikes recuperating braved stolidest riffs', 10)"
-}
 
 version(){
 	sql "SELECT version()"
