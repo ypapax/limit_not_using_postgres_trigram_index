@@ -44,6 +44,10 @@ likel(){
   sqla "SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%' limit 10"
 }
 
+likeol(){
+  sqla "SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%' order by id limit 10"
+}
+
 like2(){
 	sql "set enable_seqscan=off; EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%'"
 #	----------------------------------------------------------
