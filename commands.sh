@@ -20,7 +20,7 @@ sql() {
 }
 
 sqla() {
-  sql "EXPLAIN (ANALYZE true, FORMAT TEXT) $*"
+  sql "EXPLAIN (ANALYZE, BUFFERS) $*"
   sql "$@"
 }
 
@@ -38,6 +38,10 @@ likeb(){
 
 like(){
   sqla "SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%'"
+}
+
+likel(){
+  sqla "SELECT * FROM people WHERE name ILIKE '%wisest juxtapositions%' limit 10"
 }
 
 like2(){
